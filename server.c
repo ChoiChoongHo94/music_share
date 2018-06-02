@@ -6,6 +6,10 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <pthread.h>
+/* start add */
+#include <openssl/md5.h>
+#include <time.h>
+/* end add */
 
 #define BUF_SIZE 30
 #define MAX_CLNT 256
@@ -98,6 +102,43 @@ int main(int argc, char *argv[])
 	close(serv_sock);
 	return 0;
 }
+
+
+/* start add */
+/* MD5 구현*/
+char* genMD5Hash(char *string)
+{
+    int i;
+    unsigned char digest[MD5_DIGEST_LENGTH]; // #define MD5_DIGEST_LENGTH    16
+    char md5Hash[50] = { 0, };
+ 
+    MD5_CTX context;
+    MD5_Init(&context);
+    MD5_Update(&context, string, strlen(string));
+    MD5_Final(digest, &context);
+ 
+    for (i = 0; i<MD5_DIGEST_LENGTH; ++i)
+         sprintf(md5Hash + (i * 2), "%02x", digest[i]);
+	
+    return md5Hash;
+    //printf("res of md5(%s) : %s\n", string, md5Hash);
+}
+
+/* Random Message생성 구현*/
+char* genRandomMessage(){
+	char RandomMessage[51];
+	srand(time(NULL));
+	
+	for(int i =0; i<50 ; i++{
+		char temp = rand()&256 - 128;
+		strcat(RandomMessage, temp);
+	}
+	
+	return RandomMessage;
+}
+/* end add */
+
+
 /*
 * name : identifyOpcode(char * str)
 * function : analysis opcode
@@ -288,11 +329,10 @@ void processLogin(void * arg)
 {
 	int clnt_sock = *((int*)arg), duplicationCheck;
 	char ID[50], E_MAIL[100], PW[50], state[30];
-
-
-
+	
 	readData((void*)&clnt_sock, ID);
 	duplicationCheck = checkIDDuplication(ID);
+	
 	if (duplicationCheck == NOT_DUPLICATION)
 	{
 		strcpy(state, "logfail!");
@@ -303,10 +343,22 @@ void processLogin(void * arg)
 	{
 		strcpy(state, "logok1!");
 		write(clnt_sock, state, strlen(state));
+		
+		/* start add */
+		char RandomMessage[51] = genRandomMessage();
+		write(clnt_sock, RandomMessage, strlen(RandomMessage));
+		
+		char* ExpectedResponse = genMD5Hash(strcat(RandomMessage, CUSTOMER_INFO[duplicationIndex].PW));
+		/* end add */
 
 		readData((void*)&clnt_sock, PW);
+		
+		/* start add */
+		//test
+		printf("%s\n%s\n",ExpectedResponse, PW);
+		/* end add */
 
-		if (!strcmp(CUSTOMER_INFO[duplicationIndex].PW, PW))
+		if (!strcmp(ExpectedResponse, PW))
 		{
 			strcpy(state, "logok2!");
 			write(clnt_sock, state, strlen(state));
