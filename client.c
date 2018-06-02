@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 
 /* start add */
 /* MD5 구현*/
-char* genMD5Hash(char *string)
+void genMD5Hash(char *string, char* HASH)
 {
     int i;
     unsigned char digest[MD5_DIGEST_LENGTH]; // #define MD5_DIGEST_LENGTH    16
@@ -121,7 +121,7 @@ char* genMD5Hash(char *string)
     for (i = 0; i<MD5_DIGEST_LENGTH; ++i)
          sprintf(md5Hash + (i * 2), "%02x", digest[i]);
 	
-    return md5Hash;
+    strcpy(HASH, md5Hash);
     //printf("res of md5(%s) : %s\n", string, md5Hash);
 }
 /* end add */
@@ -377,7 +377,8 @@ void processLogin(void * arg)
 		char* RandomMessage[51];
 		readData((void*)&sock, RandomMessage);
 		
-		char* Response = genMD5Hash(strcat(RandomMessage, PW));
+		char* Response;
+		genMD5Hash(strcat(RandomMessage, PW), &Response);
 		write(sock, Response, strlen(Response));
 		/* end add */
 		
