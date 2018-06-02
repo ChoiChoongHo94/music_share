@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
 
 /* start add */
 /* MD5 구현*/
-char* genMD5Hash(char *string)
+void genMD5Hash(char *string, char* HASH)
 {
     int i;
     unsigned char digest[MD5_DIGEST_LENGTH]; // #define MD5_DIGEST_LENGTH    16
@@ -120,12 +120,12 @@ char* genMD5Hash(char *string)
     for (i = 0; i<MD5_DIGEST_LENGTH; ++i)
          sprintf(md5Hash + (i * 2), "%02x", digest[i]);
 	
-    return md5Hash;
+    strcpy(HASH, md5Hash);
     //printf("res of md5(%s) : %s\n", string, md5Hash);
 }
 
 /* Random Message생성 구현*/
-char* genRandomMessage(){
+void genRandomMessage(char* savedRM){
 	char RandomMessage[51];
 	srand(time(NULL));
 	
@@ -134,7 +134,7 @@ char* genRandomMessage(){
 		strcat(RandomMessage, temp);
 	}
 	
-	return RandomMessage;
+	strcpy(savedRM, RandomMessage);
 }
 /* end add */
 
@@ -322,7 +322,8 @@ void processRegistration(void * arg)
 
 }
 /*
-* name : processLogin(void * arg)
+* name : process
+(void * arg)
 * function : Process Login
 */
 void processLogin(void * arg)
@@ -345,10 +346,12 @@ void processLogin(void * arg)
 		write(clnt_sock, state, strlen(state));
 		
 		/* start add */
-		char RandomMessage[51] = genRandomMessage();
+		char RandomMessage[51]; 
+		genRandomMessage(RandomMessage);
 		write(clnt_sock, RandomMessage, strlen(RandomMessage));
 		
-		char* ExpectedResponse = genMD5Hash(strcat(RandomMessage, CUSTOMER_INFO[duplicationIndex].PW));
+		char* ExpectedResponse;
+		genMD5Hash(strcat(RandomMessage, CUSTOMER_INFO[duplicationIndex].PW), &ExpectedResponse);
 		/* end add */
 
 		readData((void*)&clnt_sock, PW);
