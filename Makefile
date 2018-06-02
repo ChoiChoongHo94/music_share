@@ -1,11 +1,12 @@
-diary_exe : server.o client.o
+diary_exe : server client
 
-server.o : server.c
-	gcc  -o server.o server.c -lssl -lcrypto -pthread
+server : server.c
+	gcc  -o server server.c -lcrypto -pthread 
 
-client.o : client.c
-	gcc  -o client.o client.c -lssl -lcrypto
+client : client.c
+	gcc  -o client client.c -lssl -lcrypto
 
 clean :
-	 
+	rm server
+	rm client 
 	

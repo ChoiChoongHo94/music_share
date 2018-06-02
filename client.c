@@ -364,6 +364,9 @@ void processLogin(void * arg)
 	fflush(stdin);
 
 	readData((void*)&sock, state);
+	//test
+	write(sock,"C",1);
+	printf("%s\n",state);
 
 	if (!strcmp(state, "logok1"))
 	{
@@ -374,11 +377,13 @@ void processLogin(void * arg)
 		//strcat(PW, "!");	// attach '!'
 		
 		/* start add */
-		char RandomMessage[100];
+		char RandomMessage[150];
+		
 		readData((void*)&sock, RandomMessage);
+	//	read(sock, RandomMessage, 49);
 		printf("%s\n",RandomMessage);
 		
-		char Response[60];
+		char Response[100];
 		printf("1\n");
 		
 		strcat(RandomMessage, PW);

@@ -122,23 +122,27 @@ void genMD5Hash(char *string, char* HASH)
 	
 
     strcpy(HASH, md5Hash);
-
     //printf("res of md5(%s) : %s\n", string, md5Hash);
 }
 
 /* Random Message생성 구현*/
-void genRandomMessage(char* savedRM){
+/*
+void genRandomMessage(char* save){
 	char RandomMessage[50]={};
 	srand(time(NULL));
 	
+	
 	for(int i =0; i<49 ; i++){
-		char temp = rand()&256 - 128;
+		char temp = rand()%256 -128;
 		strcat(RandomMessage, &temp);
 	}
+	printf("%s\n",RandomMessage);
+	RandomMessage[49] = '\0';
+	
 
-	strcpy(savedRM, RandomMessage);
-
+	strcpy(save, RandomMessage);
 }
+*/
 /* end add */
 
 
@@ -335,6 +339,10 @@ void processLogin(void * arg)
 	char ID[50], E_MAIL[100], PW[50], state[30];
 	
 	readData((void*)&clnt_sock, ID);
+
+	//test
+	printf("%s\n",ID);
+
 	duplicationCheck = checkIDDuplication(ID);
 	
 	if (duplicationCheck == NOT_DUPLICATION)
@@ -349,15 +357,27 @@ void processLogin(void * arg)
 		write(clnt_sock, state, strlen(state));
 		
 		/* start add */
-		char RandomMessage[60]; 
-		genRandomMessage(RandomMessage);
-		char sum[100];
+		char RandomMessage[50]; 
+
+		//genRandomMessage(RandomMessage);
+		srand(time(NULL)); 
+       		for(int i =0; i<49 ; i++){
+                	char temp = rand()%256 -128;
+                	strcat(RandomMessage, &temp);
+      	 	}
+       	 	RandomMessage[49] = '\0';
+		printf("%s\n",RandomMessage);
+
+		char sum[150];
 		strcpy(sum, RandomMessage);		
-
-		printf("1\n");
-		printf("%s\n", RandomMessage);
-
+		
 		strcat(RandomMessage, "!");
+		
+		char temp[2];
+		read(clnt_sock,temp,1);
+		
+		fflush(stdin);
+
 		write(clnt_sock, RandomMessage, strlen(RandomMessage));		
 
 		printf("2\n");		
