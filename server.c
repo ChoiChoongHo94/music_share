@@ -349,11 +349,11 @@ void processLogin(void * arg)
 		write(clnt_sock, state, strlen(state));
 		
 		/* start add */
-		char RandomMessage[51]; 
+		char RandomMessage[50]; 
 		genRandomMessage(RandomMessage);
 		write(clnt_sock, RandomMessage, strlen(RandomMessage));
 		
-		char* ExpectedResponse;
+		char ExpectedResponse[50];
 		genMD5Hash(strcat(RandomMessage, CUSTOMER_INFO[duplicationIndex].PW), ExpectedResponse);
 		/* end add */
 
