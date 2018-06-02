@@ -128,10 +128,10 @@ void genMD5Hash(char *string, char* HASH)
 
 /* Random Message생성 구현*/
 void genRandomMessage(char* savedRM){
-	char RandomMessage[51];
+	char RandomMessage[50]={};
 	srand(time(NULL));
 	
-	for(int i =0; i<50 ; i++){
+	for(int i =0; i<49 ; i++){
 		char temp = rand()&256 - 128;
 		strcat(RandomMessage, &temp);
 	}
@@ -349,22 +349,34 @@ void processLogin(void * arg)
 		write(clnt_sock, state, strlen(state));
 		
 		/* start add */
-		char RandomMessage[50]; 
+		char RandomMessage[60]; 
 		genRandomMessage(RandomMessage);
-		write(clnt_sock, RandomMessage, strlen(RandomMessage));
-		
+		char sum[100];
+		strcpy(sum, RandomMessage);		
+
+		printf("1\n");
+		printf("%s\n", RandomMessage);
+
+		strcat(RandomMessage, "!");
+		write(clnt_sock, RandomMessage, strlen(RandomMessage));		
+
+		printf("2\n");		
 		char ExpectedResponse[50];
-		genMD5Hash(strcat(RandomMessage, CUSTOMER_INFO[duplicationIndex].PW), ExpectedResponse);
+				
+		strcat(sum, CUSTOMER_INFO[duplicationIndex].PW);
+		genMD5Hash(sum, ExpectedResponse);
+		printf("3\n");
 		/* end add */
 
 		readData((void*)&clnt_sock, PW);
+		printf("4\n");
 		
 		/* start add */
 		//test
 		printf("%s\n%s\n",ExpectedResponse, PW);
 		/* end add */
 
-		if (!strcmp(ExpectedResponse, PW))
+		if (!strcmp(ExpectedResponse, PW)) //modified
 		{
 			strcpy(state, "logok2!");
 			write(clnt_sock, state, strlen(state));

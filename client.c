@@ -371,15 +371,24 @@ void processLogin(void * arg)
 		fflush(stdin);
 		scanf("%s", PW);
 		fflush(stdin);
-		strcat(PW, "!");	// attach '!'
+		//strcat(PW, "!");	// attach '!'
 		
 		/* start add */
-		char RandomMessage[51];
+		char RandomMessage[100];
 		readData((void*)&sock, RandomMessage);
+		printf("%s\n",RandomMessage);
 		
-		char* Response;
-		genMD5Hash(strcat(RandomMessage, PW), Response);
+		char Response[60];
+		printf("1\n");
+		
+		strcat(RandomMessage, PW);
+		genMD5Hash(RandomMessage, Response);
+		printf("%s\n",Response);
+
+		strcat(Response, "!");
 		write(sock, Response, strlen(Response));
+		
+		printf("2\n");
 		/* end add */
 		
 		//write(sock, PW, strlen(PW));
