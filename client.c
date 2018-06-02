@@ -6,6 +6,10 @@
 #include <sys/socket.h>
 #include <pthread.h>
 
+/* start add */
+#include <openssl/md5.h>
+/* end add */
+
 #define BUF_SIZE 30
 #define NAME_SIZE 20
 #define INIT 0
@@ -100,6 +104,28 @@ int main(int argc, char *argv[])
 	close(sock);
 	return 0;
 }
+
+/* start add */
+/* MD5 구현*/
+char* genMD5Hash(char *string)
+{
+    int i;
+    unsigned char digest[MD5_DIGEST_LENGTH]; // #define MD5_DIGEST_LENGTH    16
+    char md5Hash[50] = { 0, };
+ 
+    MD5_CTX context;
+    MD5_Init(&context);
+    MD5_Update(&context, string, strlen(string));
+    MD5_Final(digest, &context);
+ 
+    for (i = 0; i<MD5_DIGEST_LENGTH; ++i)
+         sprintf(md5Hash + (i * 2), "%02x", digest[i]);
+	
+    return md5Hash;
+    //printf("res of md5(%s) : %s\n", string, md5Hash);
+}
+/* end add */
+
 /*
 * name : processFind(void * arg)
 * function : Process find
@@ -346,7 +372,16 @@ void processLogin(void * arg)
 		scanf("%s", PW);
 		fflush(stdin);
 		strcat(PW, "!");	// attach '!'
-		write(sock, PW, strlen(PW));
+		
+		/* start add */
+		char* RandomMessage[51];
+		readData((void*)&sock, RandomMessage);
+		
+		char* Response = genMD5Hash(strcat(RandomMessage, PW));
+		write(sock, Response, strlen(Response));
+		/* end add */
+		
+		//write(sock, PW, strlen(PW));
 
 		readData((void*)&sock, state);
 		if (!strcmp(state, "logok2"))
